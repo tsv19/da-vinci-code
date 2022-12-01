@@ -113,7 +113,9 @@ std::string trata_entrada (){
 		if ( letra2 >= 65 && letra2 <= 90 )
 			letra2 += 32;
 		
-		if ( letra1 == letra2 ){
+		if ( letra1 == letra2
+			&& letra1 >= 65 && letra1 <= 90
+			&& letra2 >= 65 && letra2 <= 90 ){
 			entrada_tratada += letra1;
 			entrada_tratada += 'x';
 			i++;
@@ -130,7 +132,7 @@ std::string trata_entrada (){
 	}
 
 	// Entrada tratada com os x's nos lugares certos
-	// std::cout << entrada_tratada << std::endl;
+	std::cout << entrada_tratada << std::endl;
 	
 	return entrada_tratada;
 }
