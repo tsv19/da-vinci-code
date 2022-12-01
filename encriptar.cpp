@@ -126,13 +126,16 @@ std::string trata_entrada (){
 			if ( letra2 == '\0' )
 				letra2 = 'x';
 
+			if ( letra2 >= 48 && letra2 <= 57 )
+				entrada_tratada += 'x';
+
 			entrada_tratada += letra2;
 			i += 2;
 		}
 	}
 
 	// Entrada tratada com os x's nos lugares certos
-	std::cout << entrada_tratada << std::endl;
+	// std::cout << entrada_tratada << std::endl;
 	
 	return entrada_tratada;
 }
