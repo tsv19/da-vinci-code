@@ -22,6 +22,20 @@ int vetor_vigenere[26];
 char matriz[25+1]; 		// +1 por causa do '\0'
 char chavevg[11+1]; 	// +1 por causa do '\0'
 
+bool ehLetra(char letra){
+	if ( letra >= 97 && letra <= 122 ){
+		return true;
+	}
+	return false;
+}
+
+bool ehNumero(char letra){
+	if ( letra >= 48 && letra <= 57 ){
+		return true;
+	}
+	return false;
+}
+
 void inicia_vetores_cifra(){
 	strcpy (matriz, PF);
 	strcpy (chavevg, VG);
@@ -99,43 +113,60 @@ std::string trata_entrada (){
 	
 	// remove os espacos vazios da string, se houverem
 	entrada.erase(remove(entrada.begin(), entrada.end(), ' '), entrada.end());
-	
+
 	// string resultante sem espacos vazios
 	// std::cout << entrada << std::endl;
 
-	for (size_t i = 0 ; i < entrada.size() ; ){
-		char letra1 = entrada[i];
-		char letra2 = entrada[i+1];
+	int cont_letras = 0;
 
-		if ( letra1 >= 65 && letra1 <= 90 )
-			letra1 += 32;
-		
-		if ( letra2 >= 65 && letra2 <= 90 )
-			letra2 += 32;
-		
-		if ( letra1 == letra2
-			&& letra1 >= 65 && letra1 <= 90
-			&& letra2 >= 65 && letra2 <= 90 ){
-			entrada_tratada += letra1;
-			entrada_tratada += 'x';
+	for (size_t i = 0 ; i < entrada.size() ;){
+		char letra1 = tolower(entrada[i]);
+
+		while (!(ehLetra(letra1)) && !(ehNumero(letra1))){
 			i++;
+			letra1 = tolower(entrada[i]);
 		}
-		else {
-			entrada_tratada += letra1;
 
-			if ( letra2 == '\0' )
-				letra2 = 'x';
+		char letra2 = tolower(entrada[i+1]);
 
-			if ( letra2 >= 48 && letra2 <= 57 )
-				entrada_tratada += 'x';
+		while (!(ehLetra(letra2)) && !(ehNumero(letra2))){
+			i++;
+			letra2 = tolower(entrada[i+1]);
+		}
 
+		// se for numero
+		// garante que todos os valores antes tem pares
+		if ( ehNumero(letra1) ){
+			while ( ehNumero(letra1) ){
+				entrada_tratada += letra1;
+				i++;
+				letra1 = tolower(entrada[i]);
+			}
+			continue;
+		}
+
+		entrada_tratada += letra1;
+		i++;
+
+		// se for numero
+		// tem uma letra sem par antes
+		if ( ehNumero(letra2) ){
+			while ( ehNumero(letra2) ){
+				entrada_tratada += letra2;
+				i++;
+				letra2 = tolower(entrada[i]);
+			}
+		}
+
+		if ( letra1 == letra2 )
+			entrada_tratada += 'x';
+		else
 			entrada_tratada += letra2;
-			i += 2;
-		}
+		i++;
 	}
 
 	// Entrada tratada com os x's nos lugares certos
-	// std::cout << entrada_tratada << std::endl;
+	std::cout << entrada_tratada << std::endl;
 	
 	return entrada_tratada;
 }
