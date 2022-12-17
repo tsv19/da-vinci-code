@@ -22,14 +22,14 @@ int vetor_vigenere[26];
 char matriz[25+1]; 		// +1 por causa do '\0'
 char chavevg[11+1]; 	// +1 por causa do '\0'
 
-bool ehLetra(char letra){
+bool ehLetra(const char &letra){
 	if ( letra >= 97 && letra <= 122 ){
 		return true;
 	}
 	return false;
 }
 
-bool ehNumero(char letra){
+bool ehNumero(const char &letra){
 	if ( letra >= 48 && letra <= 57 ){
 		return true;
 	}
@@ -37,42 +37,52 @@ bool ehNumero(char letra){
 }
 
 void inicia_vetores_cifra(){
-	strcpy (matriz, PF);
-	strcpy (chavevg, VG);
+	strcpy(matriz, PF);
+	strcpy(chavevg, VG);
 
-	for (int i = 0 ; i < 26 ; i++){
-		int posicao = matriz[i] - 97;
+	for (size_t i {0} ; i < 26 ; i++){
+		int posicao {matriz[i] - 97};
 		vetor_playfair[posicao] = i;
 	}
 	vetor_playfair[9] = vetor_playfair[8];	//copia o I no J
 
-	for (int i = 0 ; i < 11 ; i++){
-		int deslocamento = chavevg[i] - 97;
+	for (size_t i {0} ; i < 11 ; i++){
+		int deslocamento {chavevg[i] - 97};
 		vetor_vigenere[i] = deslocamento;
 	}
 }
 
-char* cifra_2 (const char* entrada){
-	int tamanho	= strlen (entrada);
-	char* saida = (char *) malloc (tamanho*sizeof(char));
-	int i_chave = 0;
+std::string cifra_2(std::string &entrada){
+	std::string saida {};
+	int i_chave {0};
 
-	for (int i = 0 ; i < tamanho ; i++){
-		saida[i] = entrada[i] + vetor_vigenere[i_chave];
+	for (size_t i {0} ; i < entrada.length() ; ){
+		while ( !(ehLetra(entrada[i])) ){
+			saida += entrada[i];
+			i++;
+		}
+
+		int c {entrada[i] + vetor_vigenere[i_chave]};
+
+		if ( c > 122 ) saida += (char)(c % 123 + 97);
+		else saida += c;
+
 		i_chave = (i_chave + 1) % 11;
+		i++;
 	}
 
-	return saida;
+	entrada = saida;
+	return entrada;
 }
 
 //LEMBRAR DE VERIFICAR O I JUNTO COM O J
-std::string cifra_1 (const char* entrada){
+std::string cifra_1 (std::string &entrada){
 	std::string saida {};
 
-	for (size_t i = 0 ; i < strlen(entrada) ;){
+	for (size_t i {0} ; i < entrada.length() ;){
 		std::string aux {};
 
-		char letra1 = entrada[i];
+		char letra1 {entrada[i]};
 		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
 			saida += letra1;
 			i++;
@@ -87,7 +97,7 @@ std::string cifra_1 (const char* entrada){
 
 		i++;
 
-		char letra2 = entrada[i];
+		char letra2 {entrada[i]};
 		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) ){
 			aux += letra2;
 			i++;
@@ -103,13 +113,13 @@ std::string cifra_1 (const char* entrada){
 		// checa os pares de letras 
 		// printf("%c %c\n", letra1, letra2);
 
-		char saida1;
-		char saida2;
+		char saida1 {};
+		char saida2 {};
 
-		int linha1	= vetor_playfair[letra1 - 97] / 5;
-		int linha2	= vetor_playfair[letra2 - 97] / 5;
-		int coluna1	= vetor_playfair[letra1 - 97] % 5;
-		int coluna2	= vetor_playfair[letra2 - 97] % 5;
+		int linha1	{vetor_playfair[letra1 - 97] / 5};
+		int linha2	{vetor_playfair[letra2 - 97] / 5};
+		int coluna1	{vetor_playfair[letra1 - 97] % 5};
+		int coluna2	{vetor_playfair[letra2 - 97] % 5};
 
 		if ( linha1 == linha2 ){
 			saida1 = matriz[linha1*5 + ((coluna1+1) % 5)];
@@ -129,11 +139,10 @@ std::string cifra_1 (const char* entrada){
 		saida += saida2;
 
 		i++;
-		// Mostra os pares de letras sendo encriptadas
-		// std::cout << char (saida1) << char (saida2) << std::endl;
 	}
 
-	return saida;
+	entrada = saida;
+	return entrada;
 }
 
 void trata_entrada(std::string &entrada_tratada){
@@ -145,15 +154,15 @@ void trata_entrada(std::string &entrada_tratada){
 	// remove os espacos vazios da string, se houverem
 	entrada.erase(remove(entrada.begin(), entrada.end(), ' '), entrada.end());
 
-	for (size_t i = 0 ; i < entrada.size() ;){
-		char letra1 = tolower(entrada[i]);
+	for (size_t i {0} ; i < entrada.size() ;){
+		char letra1 {tolower(entrada[i])};
 
 		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
 			i++;
 			letra1 = entrada[i];
 		}
 
-		char letra2 = tolower(entrada[i+1]);
+		char letra2 {tolower(entrada[i+1])};
 
 		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) && letra2 != '\0' ){
 			i++;
@@ -187,7 +196,7 @@ void trata_entrada(std::string &entrada_tratada){
 	}
 
 	// Entrada tratada com os x's nos lugares certos
-	std::cout << entrada_tratada << std::endl;
+	// std::cout << entrada_tratada << std::endl;
 }
 
 
@@ -196,6 +205,10 @@ int main (){
 
 	inicia_vetores_cifra();
 	trata_entrada(entrada);
+
 	std::cout << "Saida criptografada com playfair:" << std::endl;
-	std::cout << cifra_1(entrada.c_str()) << std::endl;
+	std::cout << cifra_1(entrada) << std::endl;
+
+	std::cout << "Saida criptografada com vigenere:" << std::endl;
+	std::cout << cifra_2(entrada) << std::endl;
 }
