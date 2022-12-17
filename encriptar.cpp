@@ -67,12 +67,42 @@ char* cifra_2 (const char* entrada){
 
 //LEMBRAR DE VERIFICAR O I JUNTO COM O J
 std::string cifra_1 (const char* entrada){
-	int tamanho	= strlen (entrada);
-	std::string saida;
+	std::string saida {};
 
-	for (int i = 0 ; i < tamanho ; i += 2){
+	for (size_t i = 0 ; i < strlen(entrada) ;){
+		std::string aux {};
+
 		char letra1 = entrada[i];
-		char letra2 = entrada[i+1];
+		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
+			saida += letra1;
+			i++;
+			letra1 = entrada[i];
+		}
+
+		while ( ehNumero(letra1) ){
+			saida += letra1;
+			i++;
+			letra1 = entrada[i];
+		}
+
+		i++;
+
+		char letra2 = entrada[i];
+		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) ){
+			aux += letra2;
+			i++;
+			letra2 = entrada[i];
+		}
+
+		while ( ehNumero(letra2) ){
+			aux += letra2;
+			i++;
+			letra2 = entrada[i];
+		}
+
+		// checa os pares de letras 
+		// printf("%c %c\n", letra1, letra2);
+
 		char saida1;
 		char saida2;
 
@@ -81,11 +111,11 @@ std::string cifra_1 (const char* entrada){
 		int coluna1	= vetor_playfair[letra1 - 97] % 5;
 		int coluna2	= vetor_playfair[letra2 - 97] % 5;
 
-		if (linha1 == linha2){
+		if ( linha1 == linha2 ){
 			saida1 = matriz[linha1*5 + ((coluna1+1) % 5)];
 			saida2 = matriz[linha2*5 + ((coluna2+1) % 5)];
 		}
-		else if (coluna1 == coluna2){
+		else if ( coluna1 == coluna2 ){
 			saida1 = matriz[((linha1+1) % 5)*5 + coluna1];
 			saida2 = matriz[((linha2+1) % 5)*5 + coluna2];
 		}
@@ -95,8 +125,10 @@ std::string cifra_1 (const char* entrada){
 		}
 
 		saida += saida1;
+		saida += aux;
 		saida += saida2;
 
+		i++;
 		// Mostra os pares de letras sendo encriptadas
 		// std::cout << char (saida1) << char (saida2) << std::endl;
 	}
@@ -104,9 +136,8 @@ std::string cifra_1 (const char* entrada){
 	return saida;
 }
 
-std::string trata_entrada (){
-	std::string entrada;
-	std::string entrada_tratada;
+void trata_entrada(std::string &entrada_tratada){
+	std::string entrada {};
 	
 	// pega linha inteira de uma vez e coloca na string de entrada
 	getline(std::cin, entrada);
@@ -114,28 +145,21 @@ std::string trata_entrada (){
 	// remove os espacos vazios da string, se houverem
 	entrada.erase(remove(entrada.begin(), entrada.end(), ' '), entrada.end());
 
-	// string resultante sem espacos vazios
-	// std::cout << entrada << std::endl;
-
-	int cont_letras = 0;
-
 	for (size_t i = 0 ; i < entrada.size() ;){
 		char letra1 = tolower(entrada[i]);
 
-		while (!(ehLetra(letra1)) && !(ehNumero(letra1))){
+		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
 			i++;
-			letra1 = tolower(entrada[i]);
+			letra1 = entrada[i];
 		}
 
 		char letra2 = tolower(entrada[i+1]);
 
-		while (!(ehLetra(letra2)) && !(ehNumero(letra2))){
+		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) && letra2 != '\0' ){
 			i++;
-			letra2 = tolower(entrada[i+1]);
+			letra2 = entrada[i+1];
 		}
 
-		// se for numero
-		// garante que todos os valores antes tem pares
 		if ( ehNumero(letra1) ){
 			while ( ehNumero(letra1) ){
 				entrada_tratada += letra1;
@@ -148,35 +172,30 @@ std::string trata_entrada (){
 		entrada_tratada += letra1;
 		i++;
 
-		// se for numero
-		// tem uma letra sem par antes
-		if ( ehNumero(letra2) ){
-			while ( ehNumero(letra2) ){
-				entrada_tratada += letra2;
-				i++;
-				letra2 = tolower(entrada[i]);
-			}
+		while ( ehNumero(letra2) ){
+			entrada_tratada += letra2;
+			i++;
+			letra2 = tolower(entrada[i]);
 		}
 
-		if ( letra1 == letra2 )
+		if ( letra1 == letra2 || letra2 == '\0' )
 			entrada_tratada += 'x';
 		else
 			entrada_tratada += letra2;
+		
 		i++;
 	}
 
 	// Entrada tratada com os x's nos lugares certos
 	std::cout << entrada_tratada << std::endl;
-	
-	return entrada_tratada;
 }
 
 
 int main (){
-	std::string entrada;
+	std::string entrada {};
 
 	inicia_vetores_cifra();
-	entrada = trata_entrada();	
+	trata_entrada(entrada);
 	std::cout << "Saida criptografada com playfair:" << std::endl;
 	std::cout << cifra_1(entrada.c_str()) << std::endl;
 }
