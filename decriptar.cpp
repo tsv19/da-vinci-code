@@ -1,7 +1,10 @@
+// Autores:
+// João Lucas Cordeiro - GRR20190427
+// Tiago Serique - GRR20195138
+
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include <stdlib.h>
 #include <string.h>
 
 
@@ -22,58 +25,88 @@ int vetor_vigenere[26];
 char matriz[25+1]; 		// +1 por causa do '\0'
 char chavevg[11+1]; 	// +1 por causa do '\0'
 
-void inicia_vetores_cifra(){
-	strcpy (matriz, PF);
-	strcpy (chavevg, VG);
+bool ehLetra(const char &letra){
+	return ( letra >= 97 && letra <= 122 )? true : false;
+}
 
-	for (int i = 0 ; i < 26 ; i++){
-		int posicao = matriz[i] - 97;
+bool ehNumero(const char &letra){
+	return ( letra >= 48 && letra <= 57 )? true : false;
+}
+
+void iniciaVetoresCifra(){
+	strcpy(matriz, PF);
+	strcpy(chavevg, VG);
+
+	for (size_t i {0} ; i < 26 ; i++){
+		int posicao {matriz[i] - 97};
 		vetor_playfair[posicao] = i;
 	}
 	vetor_playfair[9] = vetor_playfair[8];	//copia o I no J
 
-	for (int i = 0 ; i < 11 ; i++){
-		int deslocamento = chavevg[i] - 97;
+	for (size_t i {0} ; i < 11 ; i++){
+		int deslocamento {chavevg[i] - 97};
 		vetor_vigenere[i] = deslocamento;
 	}
 }
 
-char* decifra_vg (const char* entrada){
-	int tamanho	= strlen (entrada);
-	char* saida = (char *) malloc (tamanho*sizeof(char));
-	int i_chave = 0;
+std::string decifra2(const std::string &entrada){
+	std::string saida {};
+	int i_chave {0};
 
-	for (int i = 0 ; i < tamanho ; i++){
-		saida[i] = entrada[i] - vetor_vigenere[i_chave];
+	for (size_t i {0} ; i < entrada.length() ; ){
+		while ( !(ehLetra(entrada[i])) ){
+			saida += entrada[i];
+			i++;
+		}
+
+		int c {entrada[i] - vetor_vigenere[i_chave]};
+
+		if ( c < 97 ) saida += (char)(123 - 97 % c);
+		else saida += c;
+
 		i_chave = (i_chave + 1) % 11;
+		i++;
 	}
 
 	return saida;
 }
 
-std::string decifra_pf (const char* entrada){
-    int tamanho	= strlen (entrada);
-    std::string saida;
+std::string decifra1(const std::string &entrada){
+    std::string saida {};
 
-	for (int i = 0 ; i < tamanho ; i += 2){
-		char letra1 = entrada[i];
-		char letra2 = entrada[i+1];
-        char saida1;
-		char saida2;
+	for (size_t i {0} ; i < entrada.length() ; ){
+		std::string aux {};
 
-		int linha1	= vetor_playfair[letra1 - 97] / 5;
-		int linha2	= vetor_playfair[letra2 - 97] / 5;
-		int coluna1	= vetor_playfair[letra1 - 97] % 5;
-		int coluna2	= vetor_playfair[letra2 - 97] % 5;
+		char letra1 {entrada[i]};
+		while ( !(ehLetra(letra1)) ){
+			saida += letra1;
+			i++;
+			letra1 = entrada[i];
+		}
 
-		if (linha1 == linha2){        
-            coluna1 = (coluna1 - 1);
-            if ( coluna1 == -1 ) 
-                coluna1 = 4;
+		i++;
+
+		char letra2 {entrada[i]};
+		while ( !(ehLetra(letra2)) ){
+			aux += letra2;
+			i++;
+			letra2 = entrada[i];
+		}
+
+		char saida1 {};
+		char saida2 {};
+
+		int linha1	{vetor_playfair[letra1 - 97] / 5};
+		int linha2	{vetor_playfair[letra2 - 97] / 5};
+		int coluna1	{vetor_playfair[letra1 - 97] % 5};
+		int coluna2	{vetor_playfair[letra2 - 97] % 5};
+
+		if ( linha1 == linha2 ){       
+            coluna1 = coluna1 - 1;
+            if ( coluna1 == -1 ) coluna1 = 4;
             
-            coluna2 = (coluna2 - 1);
-            if ( coluna2 == -1 ) 
-                coluna2 = 4;
+            coluna2 = coluna2 - 1;
+            if ( coluna2 == -1 ) coluna2 = 4;
 
 			saida1 = matriz[linha1*5 + (coluna1 % 5)];
 			saida2 = matriz[linha2*5 + (coluna2 % 5)];
@@ -88,10 +121,10 @@ std::string decifra_pf (const char* entrada){
 		}
 
         saida += saida1;
+		saida += aux;
         saida += saida2;
 
-        // Mostra os pares de letras sendo traduzidas
-        // std::cout << char (saida1) << char (saida2) << std::endl;
+		i++;
 	}
     
 	return saida;
@@ -101,9 +134,10 @@ std::string decifra_pf (const char* entrada){
 int main (){
     std::string entrada;
     
-	inicia_vetores_cifra();
+	iniciaVetoresCifra();
 
     getline(std::cin, entrada);
 
-    std::cout << decifra_pf(entrada.c_str()) << std::endl; 
+    std::cout << "Texto claro:" << std::endl; 
+    std::cout << decifra1(decifra2(entrada)) << std::endl; 
 }

@@ -1,7 +1,10 @@
+// Autores:
+// João Lucas Cordeiro - GRR20190427
+// Tiago Serique - GRR20195138
+
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include <stdlib.h>
 #include <string.h>
 
 
@@ -23,20 +26,14 @@ char matriz[25+1]; 		// +1 por causa do '\0'
 char chavevg[11+1]; 	// +1 por causa do '\0'
 
 bool ehLetra(const char &letra){
-	if ( letra >= 97 && letra <= 122 ){
-		return true;
-	}
-	return false;
+	return ( letra >= 97 && letra <= 122 )? true : false;
 }
 
 bool ehNumero(const char &letra){
-	if ( letra >= 48 && letra <= 57 ){
-		return true;
-	}
-	return false;
+	return ( letra >= 48 && letra <= 57 )? true : false;
 }
 
-void inicia_vetores_cifra(){
+void iniciaVetoresCifra(){
 	strcpy(matriz, PF);
 	strcpy(chavevg, VG);
 
@@ -52,7 +49,7 @@ void inicia_vetores_cifra(){
 	}
 }
 
-std::string cifra_2(std::string &entrada){
+std::string cifra2(const std::string &entrada){
 	std::string saida {};
 	int i_chave {0};
 
@@ -71,25 +68,18 @@ std::string cifra_2(std::string &entrada){
 		i++;
 	}
 
-	entrada = saida;
-	return entrada;
+	return saida;
 }
 
 //LEMBRAR DE VERIFICAR O I JUNTO COM O J
-std::string cifra_1 (std::string &entrada){
+std::string cifra1(const std::string &entrada){
 	std::string saida {};
 
 	for (size_t i {0} ; i < entrada.length() ;){
 		std::string aux {};
 
 		char letra1 {entrada[i]};
-		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
-			saida += letra1;
-			i++;
-			letra1 = entrada[i];
-		}
-
-		while ( ehNumero(letra1) ){
+		while ( !(ehLetra(letra1)) ){
 			saida += letra1;
 			i++;
 			letra1 = entrada[i];
@@ -98,20 +88,11 @@ std::string cifra_1 (std::string &entrada){
 		i++;
 
 		char letra2 {entrada[i]};
-		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) ){
+		while ( !(ehLetra(letra2)) ){
 			aux += letra2;
 			i++;
 			letra2 = entrada[i];
 		}
-
-		while ( ehNumero(letra2) ){
-			aux += letra2;
-			i++;
-			letra2 = entrada[i];
-		}
-
-		// checa os pares de letras 
-		// printf("%c %c\n", letra1, letra2);
 
 		char saida1 {};
 		char saida2 {};
@@ -141,11 +122,10 @@ std::string cifra_1 (std::string &entrada){
 		i++;
 	}
 
-	entrada = saida;
-	return entrada;
+	return saida;
 }
 
-void trata_entrada(std::string &entrada_tratada){
+void trataEntrada(std::string &entrada_tratada){
 	std::string entrada {};
 	
 	// pega linha inteira de uma vez e coloca na string de entrada
@@ -155,14 +135,14 @@ void trata_entrada(std::string &entrada_tratada){
 	entrada.erase(remove(entrada.begin(), entrada.end(), ' '), entrada.end());
 
 	for (size_t i {0} ; i < entrada.size() ;){
-		char letra1 {tolower(entrada[i])};
+		char letra1 {(char) tolower(entrada[i])};
 
 		while ( !(ehLetra(letra1)) && !(ehNumero(letra1)) ){
 			i++;
 			letra1 = entrada[i];
 		}
 
-		char letra2 {tolower(entrada[i+1])};
+		char letra2 {(char) tolower(entrada[i+1])};
 
 		while ( !(ehLetra(letra2)) && !(ehNumero(letra2)) && letra2 != '\0' ){
 			i++;
@@ -194,21 +174,15 @@ void trata_entrada(std::string &entrada_tratada){
 		
 		i++;
 	}
-
-	// Entrada tratada com os x's nos lugares certos
-	// std::cout << entrada_tratada << std::endl;
 }
 
 
-int main (){
+int main(){
 	std::string entrada {};
 
-	inicia_vetores_cifra();
-	trata_entrada(entrada);
+	iniciaVetoresCifra();
+	trataEntrada(entrada);
 
-	std::cout << "Saida criptografada com playfair:" << std::endl;
-	std::cout << cifra_1(entrada) << std::endl;
-
-	std::cout << "Saida criptografada com vigenere:" << std::endl;
-	std::cout << cifra_2(entrada) << std::endl;
+	std::cout << "Cifra final:" << std::endl;
+	std::cout << cifra2(cifra1(entrada)) << std::endl;
 }
