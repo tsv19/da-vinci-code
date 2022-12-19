@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <string.h>
 
-
 #define PF "deraonlhsivftgpcbuqmxzkwy"
 // Tabela Play Fair
 // DERAO
@@ -166,7 +165,7 @@ void trataEntrada(std::string &entrada_tratada){
 	deixaMinuscula(entrada);
 
 	for (size_t i {0} ; i < entrada.size() ;){
-		char letra1 {(char) tolower(entrada[i])};
+		char letra1 {entrada[i]};
 
 		//enquanto não for letra e não ultrapassar o tamanho da string
 		while ( !(ehLetra(letra1)) && (i < entrada.size())){
@@ -185,7 +184,7 @@ void trataEntrada(std::string &entrada_tratada){
 		entrada_tratada += letra1;
 		i++;
 		
-		char letra2 {(char) tolower(entrada[i])};
+		char letra2 {entrada[i]};
 
 		while ( !(ehLetra(letra2)) && (i < entrada.size())){
 			//se for um número, coloca na string
